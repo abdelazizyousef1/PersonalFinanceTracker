@@ -21,7 +21,7 @@ namespace Personal_Finance_Tracker.Presentation.Controllers
         {
             if (!ModelState.IsValid)
             {
-                throw new Exception("");
+                throw new Exception("transfer not valid");
             }
             try
             {
@@ -39,7 +39,7 @@ namespace Personal_Finance_Tracker.Presentation.Controllers
         {
             if (!ModelState.IsValid)
             {
-                throw new Exception("");
+                throw new Exception("transfer not valid");
             }
             try
             {
@@ -57,10 +57,7 @@ namespace Personal_Finance_Tracker.Presentation.Controllers
         [Route("GetAllTransaction")]
         public async Task<IEnumerable<Transaction>> GetAllTransaction()
         {
-            if (!ModelState.IsValid)
-            {
-                throw new Exception("");
-            }
+            
             try
             {
                 var transactions = await _transactionServices.GetAllTransaction();
@@ -78,7 +75,7 @@ namespace Personal_Finance_Tracker.Presentation.Controllers
         {
             if (!ModelState.IsValid)
             {
-                throw new Exception("");
+                throw new Exception("transfer not valid");
             }
             try
             {
