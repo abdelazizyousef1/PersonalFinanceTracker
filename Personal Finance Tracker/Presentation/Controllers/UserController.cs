@@ -5,7 +5,7 @@ using Personal_Finance_Tracker.Domin;
 
 namespace Personal_Finance_Tracker.Presentation.Controllers
 {
-    [Route("[controller]")]
+    [Route(("api/[controller]"))]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -16,74 +16,71 @@ namespace Personal_Finance_Tracker.Presentation.Controllers
         }
 
         [HttpPost]
-        [Route("AddUser")]
-        public async Task NewUser(string name)
+        public async Task<IActionResult> AddUser(string name)
         {
-            if (!ModelState.IsValid)
-            {
-                throw new Exception("user not added");
-            }
+            
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("name of user not added");
+                }
                 await _userServices.AddUser(name);
-
+                return StatusCode(201);
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
-        [HttpGet]
-        [Route("GetUser")]
-        public async Task<User> GetUser(int Id)
+
+
+        [HttpGet("[id]")]
+        public async Task<IActionResult> GetUser(int Id)
         {
-            if (!ModelState.IsValid)
-            {
-                throw new Exception("");
-            }
+            
             try
             {
+                if (Id <= 0)
+                    return BadRequest("Invalid transaction ID.");
                 var user = await _userServices.GetUser(Id);
-                return (user);
+                return Ok(user);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return StatusCode(500, ex.Message);
             }
 
         }
 
+
         [HttpGet]
-        [Route("GetAllUsers")]
-        public async Task<IEnumerable<User>> GetAllUser()
+        public async Task<IActionResult> GetAllUsers()
         {
-            if (!ModelState.IsValid)
-            {
-                throw new Exception("");
-            }
+            
             try
             {
                 var users = await _userServices.GetAllUser();
-                return (users);
+                return Ok(users);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return StatusCode(500, ex.Message);
             }
 
         }
-        [HttpGet]
-        [Route("DeleteUser")]
+
+
+        [HttpDelete("[id]")]
         public async Task<IActionResult> DeleteUser(int Id)
         {
-            if (!ModelState.IsValid)
-            {
-                throw new Exception("");
-            }
             try
             {
+                if (Id <= 0)
+                    return BadRequest("Invalid transaction ID.");
+
                 await _userServices.DeleteUser(Id);
-                return Ok();
+                return Ok(new { Message = "Transaction deleted successfully." });
             }
             catch (Exception ex)
             {

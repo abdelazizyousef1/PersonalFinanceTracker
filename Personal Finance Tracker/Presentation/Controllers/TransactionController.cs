@@ -5,8 +5,8 @@ using Personal_Finance_Tracker.Domin;
 namespace Personal_Finance_Tracker.Presentation.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class TransactionController :ControllerBase
+    [Route("api/transactions")]
+    public class TransactionController : ControllerBase
     {
         private readonly ITransactionServices _transactionServices;
 
@@ -15,78 +15,78 @@ namespace Personal_Finance_Tracker.Presentation.Controllers
             _transactionServices = transactionServices;
         }
 
+
         [HttpPost]
-        [Route("AddTransaction")]
-        public async Task<IActionResult> NewTransaction(Transaction transaction)
+        public async Task<IActionResult> Transfer( Transaction transaction)
         {
             if (!ModelState.IsValid)
             {
-                throw new Exception("transfer not valid");
+                return BadRequest("Invalid transaction data.");
             }
+
             try
             {
                 await _transactionServices.AddTransaction(transaction);
-                return Ok(201);
+                return StatusCode(201, new { Message = "Transaction added successfully." });
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
-        [HttpGet]
-        [Route("GetTransaction")]
-        public async Task<Transaction> GetTransaction(int Id)
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTransaction(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                throw new Exception("transfer not valid");
-            }
             try
             {
-                var transaction = await _transactionServices.GetTransaction(Id);
-                return (transaction);
+                if (id <= 0)
+                    return BadRequest("Invalid transaction ID.");
+
+                var transaction = await _transactionServices.GetTransaction(id);
+                if (transaction == null)
+                    return NotFound("Transaction not found.");
+
+                return Ok(transaction);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return StatusCode(500, ex.Message);
             }
-
         }
 
+
         [HttpGet]
-        [Route("GetAllTransaction")]
-        public async Task<IEnumerable<Transaction>> GetAllTransaction()
+        public async Task<IActionResult> GetAllTransactions()
         {
-            
             try
             {
                 var transactions = await _transactionServices.GetAllTransaction();
-                return (transactions);
+                return Ok(transactions);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return StatusCode(500, ex.Message);
             }
-
         }
-        [HttpGet]
-        [Route("DeleteTransaction")]
-        public async Task<IActionResult> DeleteTransaction(int Id)
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTransaction(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                throw new Exception("transfer not valid");
-            }
             try
             {
-                 await _transactionServices.DeleteTransaction(Id);
-                return Ok(200);
+                if (id <= 0)
+                    return BadRequest("Invalid transaction ID.");
+
+                await _transactionServices.DeleteTransaction(id);
+                return Ok(new { Message = "Transaction deleted successfully." });
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return BadRequest(ex.Message);
             }
-
         }
     }
 }
